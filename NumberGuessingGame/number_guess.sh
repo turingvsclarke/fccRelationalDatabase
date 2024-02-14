@@ -8,12 +8,8 @@ if [[ -z $USER_RESULT ]]
 then
 echo "Welcome, $USERNAME! It looks like this is your first time here.";
 else
-echo "$USER_RESULT" | while read GAMES_PLAYED BAR BEST_GAME
-do
-GP=$GAMES_PLAYED;
-BG=$BEST_GAME;
+read GAMES_PLAYED BAR BEST_GAME < <(echo "$USER_RESULT" )
 echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
-done
 fi
 # Generate random number
 RANDOM_NUMBER=$(($RANDOM%1000))
@@ -39,16 +35,10 @@ if [[ -z $USER_RESULT ]]
 then 
 NEW_SCORE=$($PSQL "insert into users(games_played, best_game, username) values(1, $COUNT, '$USERNAME')");
 else
-echo "$USER_RESULT" | while read GAMES_PLAYED BAR BEST_GAME
-do 
 if (( $COUNT < $BEST_GAME ))
-then echo "That was your best game!"
-NEW_SCORE=$($PSQL "update users set games_played=$(($GAMES_PLAYED+1)), best_game=$COUNT where username='$USERNAME'")
-else 
-echo "that wasnt a new best"
-NEW_SCORE=$($PSQL "update users set games_played=$(($GAMES_PLAYED+1)), best_game=$BEST_GAME where username='$USERNAME'")
+then BEST_GAME=$COUNT;
 fi
-done
+NEW_SCORE=$($PSQL "update users set games_played=$(($GAMES_PLAYED+1)), best_game=$BEST_GAME where username='$USERNAME'")
 fi
 
 echo "You guessed it in $COUNT tries. The secret number was $RANDOM_NUMBER. Nice job!"
