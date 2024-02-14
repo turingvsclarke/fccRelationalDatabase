@@ -12,13 +12,9 @@ fi
 if [[ -z $RESULT ]]
 then echo "I could not find that element in the database.";
 else
-echo "$RESULT" | while read NUMBER BAR NAME BAR SYMBOL
-do
+read NUMBER BAR NAME BAR SYMBOL < <(echo "$RESULT")
 PROPS=$($PSQL "select type, atomic_mass, boiling_point_celsius, melting_point_celsius from properties left join types using(type_id) where atomic_number=$NUMBER")
-echo "$PROPS" | while read TYPE BAR MASS BAR BOILING BAR MELTING
-do
+read TYPE BAR MASS BAR BOILING BAR MELTING < <(echo "$PROPS")
 echo "The element with atomic number $NUMBER is $NAME ($SYMBOL). It's a $TYPE, with a mass of $MASS amu. $NAME has a melting point of $MELTING celsius and a boiling point of $BOILING celsius.";
-done
-done
 fi
 fi
